@@ -56,15 +56,18 @@ public class FileSystemSimulator {
     // Método para exibir ajuda
     public static void exibirAjuda() {
         System.out.println("Comandos disponíveis:");
-        System.out.println("  mkdir <nome>             - Criar um diretório");
-        System.out.println("  touch <diretório> <nome> - Criar um arquivo em um diretório específico");
-        System.out.println("  touch <nome>             - Criar um arquivo no diretório raiz");
-        System.out.println("  rm <nome>                - Apagar um arquivo ou diretório");
-        System.out.println("  ls                       - Listar o conteúdo do diretório atual");
-        System.out.println("  lsdir <diretorio>        - Listar o conteúdo do diretório especifico");
-        System.out.println("  mv <origem> <destino>    - Mover um arquivo de um diretório para outro");
-        System.out.println("  help                     - Mostrar esta ajuda");
-        System.out.println("  exit                     - Encerrar o simulador");
+        System.out.println("  mkdir <nome>                 - Criar um diretório");
+        System.out.println("  touch <diretório> <nome>     - Criar um arquivo em um diretório específico");
+        System.out.println("  touch <nome>                 - Criar um arquivo no diretório raiz");
+        System.out.println("  rm <nome>                    - Apagar um arquivo");
+        System.out.println("  rmdir <nome>                 - Apagar um diretório");
+        System.out.println("  rename <arquivo> <nome>      - Renomeia um arquivo");
+        System.out.println("  renamedir <diretorio> <nome> - Renomeia um diretório");
+        System.out.println("  ls                           - Listar o conteúdo do diretório atual");
+        System.out.println("  lsdir <diretorio>            - Listar o conteúdo do diretório especifico");
+        System.out.println("  mv <origem> <destino>        - Mover um arquivo de um diretório para outro");
+        System.out.println("  help                         - Mostrar esta ajuda");
+        System.out.println("  exit                         - Encerrar o simulador");
     }
 
     // Método para mover um arquivo de um diretório para outro
