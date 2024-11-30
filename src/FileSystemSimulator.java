@@ -85,6 +85,7 @@ public class FileSystemSimulator {
         System.out.println("  rmda <caminho_diretorio> <nome_arquivo> - Apaga arquivo de um diretório.");
         System.out.println("  rename <arquivo> <nome>      - Renomeia um arquivo");
         System.out.println("  renamedir <diretorio> <nome> - Renomeia um diretório");
+        System.out.println("  renamefiledir <diretório> <nome_antigo> <novo_nome>>        - Renomear um arquivo dentro de um diretorio.");
         System.out.println("  ls                           - Listar o conteúdo do diretório atual");
         System.out.println("  lsdir <diretorio>            - Listar o conteúdo do diretório especifico");
         System.out.println("  mv <origem> <destino>        - Mover um arquivo de um diretório para outro");
@@ -119,6 +120,21 @@ public class FileSystemSimulator {
             journal.registrarOperacao("cp " + diretorio.getNome() + "/" + nomeOriginal + " -> " + nomeCopia);
         } else {
             System.out.println("Arquivo " + nomeOriginal + " não encontrado.");
+        }
+    }
+
+    // Método para renomear um arquivo dentro de um diretório específico
+    public static void renomearArquivoEmDiretorio(Directory diretorioPai, String nomeDiretorio, String nomeAntigo, String novoNome) {
+        Directory subdiretorio = diretorioPai.buscarSubdiretorio(nomeDiretorio);
+        if (subdiretorio != null) {
+            if (subdiretorio.renomearArquivoDiretorio(nomeAntigo, novoNome)) {
+                System.out.println("Arquivo " + nomeAntigo + " renomeado para " + novoNome + " no diretório " + nomeDiretorio);
+                journal.registrarOperacao("rename " + diretorioPai.getNome() + "/" + nomeDiretorio + "/" + nomeAntigo + " -> " + novoNome);
+            } else {
+                System.out.println("Arquivo " + nomeAntigo + " não encontrado no diretório " + nomeDiretorio);
+            }
+        } else {
+            System.out.println("Diretório " + nomeDiretorio + " não encontrado.");
         }
     }
 
@@ -233,6 +249,16 @@ public class FileSystemSimulator {
                             renomearDiretorio(diretorioAtual, partes[1], partes[2]);
                         } else {
                             System.out.println("Uso: renamedir <nome_antigo> <novo_nome>");
+                        }
+                        break;
+                    case "renamefiledir":
+                        if (partes.length == 4) {
+                            String nomeDiretorio = partes[1];
+                            String nomeAntigo = partes[2];
+                            String novoNome = partes[3];
+                            renomearArquivoEmDiretorio(diretorioAtual, nomeDiretorio, nomeAntigo, novoNome);
+                        } else {
+                            System.out.println("Uso: renamefiledir <diretório> <nome_antigo> <novo_nome>");
                         }
                         break;
                     case "cp":

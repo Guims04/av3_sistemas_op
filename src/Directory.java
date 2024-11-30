@@ -99,6 +99,16 @@ public class Directory {
         return false;  // Retorna falso se o arquivo não for encontrado
     }
 
+    public boolean renomearArquivoDiretorio(String nomeAntigo, String novoNome) {
+        for (File arquivo : arquivos) {
+            if (arquivo.getNome().equals(nomeAntigo)) {
+                arquivo.setNome(novoNome);
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Método para copiar um arquivo dentro do diretório
     public boolean copiarArquivo(String nome, String nomeCopia) {
         File arquivoOriginal = arquivos.stream()
@@ -128,6 +138,5 @@ public class Directory {
         }
         return false;  // Retorna falso se o diretório não for encontrado
     }
-
 
 }
