@@ -52,8 +52,8 @@ A estrutura do log será simples, contendo informações como:
 ## Parte 3: Implementação em Java
 
 ### Classe "FileSystemSimulator"
-
 A classe `FileSystemSimulator` é o núcleo do simulador. Ela gerencia os arquivos e diretórios, processando os comandos do usuário. Abaixo está um esboço de como seria a classe:
+
 
 ```java
 public class FileSystemSimulator {
@@ -86,7 +86,7 @@ public class FileSystemSimulator {
         }
     }
 }
-
+```
 ### Classes "File" e "Directory"
 
 Essas classes são responsáveis por representar os arquivos e diretórios no sistema de arquivos. A classe `File` terá atributos como `nome` e métodos para manipular os arquivos, enquanto `Directory` terá uma lista de arquivos e subdiretórios.
@@ -120,14 +120,3 @@ public class Journal {
 Espera-se que o simulador forneça insights sobre o funcionamento de um sistema de arquivos. Com base nos resultados obtidos, será possível avaliar como a implementação do journaling pode melhorar a confiabilidade das operações de sistema de arquivos, especialmente em cenários de falhas ou inconsistências. Além disso, a implementação permitirá um entendimento mais profundo de como os sistemas operacionais lidam com dados persistentes e a recuperação após falhas.
 
 A partir dessa simulação, será possível explorar e testar o comportamento do sistema de arquivos simulado em várias situações, verificando como ele responde a comandos de manipulação de arquivos e como o journaling ajuda na recuperação e auditoria das operações realizadas.
-```
-
-### Explicação do Relatório
-
-- **Metodologia**: Descreve a abordagem do desenvolvimento do simulador, destacando que ele será feito em Java e que o foco será em simular as operações típicas de um sistema de arquivos.
-- **Parte 1: Introdução ao Sistema de Arquivos com Journaling**: Fornece uma explicação sobre o que é um sistema de arquivos e o conceito de journaling, incluindo tipos de journaling.
-- **Parte 2: Arquitetura do Simulador**: Explica as estruturas de dados usadas (classes `File`, `Directory`, `FileSystemSimulator`, e `Journal`) e como o journaling será implementado.
-- **Parte 3: Implementação em Java**: Mostra como as classes e operações serão implementadas em Java, com exemplos de código.
-- **Resultados Esperados**: Explica o que se espera alcançar com o simulador e os insights que ele pode proporcionar sobre o funcionamento de sistemas de arquivos.
-
-Esse formato de relatório pode ser ajustado conforme o progresso do projeto ou novas decisões de design.
