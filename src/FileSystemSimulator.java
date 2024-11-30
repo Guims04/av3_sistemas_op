@@ -53,6 +53,27 @@ public class FileSystemSimulator {
         }
     }
 
+    // Método para apagar um arquivo dentro de um diretório.
+    public static void apagarArquivoEmDiretorio(Directory diretorioAtual, String caminhoDiretorio, String nomeArquivo) {
+        String[] partesCaminho = caminhoDiretorio.split("/");
+
+        Directory diretorio = diretorioAtual;
+        for (String parte : partesCaminho) {
+            diretorio = diretorio.buscarSubdiretorio(parte);
+            if (diretorio == null) {
+                System.out.println("Diretório " + parte + " não encontrado no caminho " + caminhoDiretorio);
+                return;
+            }
+        }
+
+        if (diretorio.removerArquivo(nomeArquivo)) {
+            System.out.println("Arquivo " + nomeArquivo + " removido de " + caminhoDiretorio);
+            journal.registrarOperacao("rm " + caminhoDiretorio + "/" + nomeArquivo);
+        } else {
+            System.out.println("Arquivo " + nomeArquivo + " não encontrado no diretório " + caminhoDiretorio);
+        }
+    }
+
     // Método para exibir ajuda
     public static void exibirAjuda() {
         System.out.println("Comandos disponíveis:");
@@ -61,6 +82,7 @@ public class FileSystemSimulator {
         System.out.println("  touch <nome>                 - Criar um arquivo no diretório raiz");
         System.out.println("  rm <nome>                    - Apagar um arquivo");
         System.out.println("  rmdir <nome>                 - Apagar um diretório");
+        System.out.println("  rmda <caminho_diretorio> <nome_arquivo> - Apaga arquivo de um diretório.");
         System.out.println("  rename <arquivo> <nome>      - Renomeia um arquivo");
         System.out.println("  renamedir <diretorio> <nome> - Renomeia um diretório");
         System.out.println("  ls                           - Listar o conteúdo do diretório atual");
@@ -161,6 +183,13 @@ public class FileSystemSimulator {
                             apagarArquivo(diretorioAtual, partes[1]);
                         } else {
                             System.out.println("Uso: rm <nome>");
+                        }
+                        break;
+                    case "rmda":
+                        if (partes.length == 3) {
+                            apagarArquivoEmDiretorio(diretorioAtual, partes[1], partes[2]);
+                        } else {
+                            System.out.println("Uso: rmda <caminho_diretorio> <nome_arquivo>");
                         }
                         break;
                     case "rmdir":

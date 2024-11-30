@@ -41,3 +41,15 @@ mkdir raiz/teste
 touch teste/texto
 ls raiz
 ls teste
+mkdir raiz/h
+ls raiz
+mkdir raiz/guilherme
+touch guilherme/gay
+ls raiz
+ls guilherme
+ls guilherme
+ls raiz
+mkdir raiz/merda
+touch merda/ok
+ls merda
+rm merda/ok
