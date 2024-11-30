@@ -1,1 +1,5 @@
-CREATE DIRECTORY teste
+ls raiz
+ls raiz
+touch raiz/./teste/arquivo.txt
+ls raiz
+ls raiz
