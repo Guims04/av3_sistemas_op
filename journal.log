@@ -3,3 +3,41 @@ ls raiz
 touch raiz/./teste/arquivo.txt
 ls raiz
 ls raiz
+ls raiz
+mkdir raiz/teste
+ls raiz
+ls raiz
+ls raiz
+mkdir raiz/teste
+ls raiz
+touch teste/arquivo.txt
+ls raiz
+ls raiz
+ls raiz
+ls raiz
+touch raiz/arquivo.txt
+ls raiz
+cp raiz/arquivo.txt -> teste.txt
+ls raiz
+rename raiz/arquivo.txt -> arquivo2.txt
+ls raiz
+mkdir raiz/diretorio_teste
+ls raiz
+ls raiz
+mkdir raiz/teste
+ls raiz
+rm raiz/teste
+mkdir raiz/teste
+ls raiz
+renamedir teste -> teste2
+ls raiz
+ls raiz
+mkdir raiz/teste
+ls raiz
+touch teste/texto
+ls raiz
+ls raiz
+mkdir raiz/teste
+touch teste/texto
+ls raiz
+ls teste

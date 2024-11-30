@@ -1,11 +1,10 @@
-import java.io.IOException;
 import java.util.Scanner;
 
 public class FileSystemSimulator {
 
     private static final Journal journal = new Journal();
 
-    // Método para criar um arquivo
+    // Método para criar um arquivo dentro de um diretório
     public static void criarArquivo(Directory diretorio, String nome) {
         if (diretorio.contemArquivo(nome)) {
             System.out.println("Arquivo " + nome + " já existe no diretório.");
@@ -57,15 +56,67 @@ public class FileSystemSimulator {
     // Método para exibir ajuda
     public static void exibirAjuda() {
         System.out.println("Comandos disponíveis:");
-        System.out.println("  mkdir <nome>         - Criar um diretório");
-        System.out.println("  touch <nome>         - Criar um arquivo");
-        System.out.println("  rm <nome>            - Apagar um arquivo ou diretório");
-        System.out.println("  ls                   - Listar o conteúdo do diretório atual");
-        System.out.println("  help                 - Mostrar esta ajuda");
-        System.out.println("  exit                 - Encerrar o simulador");
+        System.out.println("  mkdir <nome>             - Criar um diretório");
+        System.out.println("  touch <diretório> <nome> - Criar um arquivo em um diretório específico");
+        System.out.println("  touch <nome>             - Criar um arquivo no diretório raiz");
+        System.out.println("  rm <nome>                - Apagar um arquivo ou diretório");
+        System.out.println("  ls                       - Listar o conteúdo do diretório atual");
+        System.out.println("  lsdir <diretorio>        - Listar o conteúdo do diretório especifico");
+        System.out.println("  mv <origem> <destino>    - Mover um arquivo de um diretório para outro");
+        System.out.println("  help                     - Mostrar esta ajuda");
+        System.out.println("  exit                     - Encerrar o simulador");
     }
 
-    // Modo Shell com suporte a comandos
+    // Método para mover um arquivo de um diretório para outro
+    public static void moverArquivo(Directory origem, Directory destino, String nomeArquivo) {
+        if (origem.moverArquivo(destino, nomeArquivo)) {
+            System.out.println("Arquivo " + nomeArquivo + " movido de " + origem.getNome() + " para " + destino.getNome());
+            journal.registrarOperacao("mv " + origem.getNome() + "/" + nomeArquivo + " -> " + destino.getNome());
+        } else {
+            System.out.println("Arquivo " + nomeArquivo + " não encontrado em " + origem.getNome());
+        }
+    }
+
+    // Método para renomear um arquivo
+    public static void renomearArquivo(Directory diretorio, String nomeAntigo, String novoNome) {
+        if (diretorio.renomearArquivo(nomeAntigo, novoNome)) {
+            System.out.println("Arquivo " + nomeAntigo + " renomeado para " + novoNome);
+            journal.registrarOperacao("rename " + diretorio.getNome() + "/" + nomeAntigo + " -> " + novoNome);
+        } else {
+            System.out.println("Arquivo " + nomeAntigo + " não encontrado.");
+        }
+    }
+
+    // Método para copiar um arquivo
+    public static void copiarArquivo(Directory diretorio, String nomeOriginal, String nomeCopia) {
+        if (diretorio.copiarArquivo(nomeOriginal, nomeCopia)) {
+            System.out.println("Arquivo " + nomeOriginal + " copiado para " + nomeCopia);
+            journal.registrarOperacao("cp " + diretorio.getNome() + "/" + nomeOriginal + " -> " + nomeCopia);
+        } else {
+            System.out.println("Arquivo " + nomeOriginal + " não encontrado.");
+        }
+    }
+
+    // Método para renomear diretório
+    public static void renomearDiretorio(Directory diretorio, String nomeAntigo, String novoNome) {
+        if (diretorio.renomearDiretorio(nomeAntigo, novoNome)) {
+            System.out.println("Diretório " + nomeAntigo + " renomeado para " + novoNome);
+            journal.registrarOperacao("renamedir " + nomeAntigo + " -> " + novoNome);
+        } else {
+            System.out.println("Diretório " + nomeAntigo + " não encontrado.");
+        }
+    }
+
+    // Método para listar um diretório específico
+    public static void listarDiretorioEspecifico(Directory diretorioAtual, String nomeDiretorio) {
+        Directory subdiretorio = diretorioAtual.buscarSubdiretorio(nomeDiretorio);
+        if (subdiretorio != null) {
+            listarDiretorio(subdiretorio);
+        } else {
+            System.out.println("Diretório " + nomeDiretorio + " não encontrado.");
+        }
+    }
+
     public static void modoShell() {
         Scanner scanner = new Scanner(System.in);
         Directory raiz = new Directory("raiz");
@@ -89,10 +140,17 @@ public class FileSystemSimulator {
                         }
                         break;
                     case "touch":
-                        if (partes.length == 2) {
+                        if (partes.length == 3) {
+                            Directory diretorioAlvo = diretorioAtual.buscarSubdiretorio(partes[1]);
+                            if (diretorioAlvo != null) {
+                                criarArquivo(diretorioAlvo, partes[2]);
+                            } else {
+                                System.out.println("Diretório " + partes[1] + " não encontrado.");
+                            }
+                        } else if (partes.length == 2) {
                             criarArquivo(diretorioAtual, partes[1]);
                         } else {
-                            System.out.println("Uso: touch <nome>");
+                            System.out.println("Uso: touch <diretório> <nome>");
                         }
                         break;
                     case "rm":
@@ -102,24 +160,72 @@ public class FileSystemSimulator {
                             System.out.println("Uso: rm <nome>");
                         }
                         break;
+                    case "rmdir":
+                        if (partes.length == 2) {
+                            apagarDiretorio(diretorioAtual, partes[1]);
+                        } else {
+                            System.out.println("Uso: rm <nome>");
+                        }
+                        break;
                     case "ls":
                         listarDiretorio(diretorioAtual);
+                        break;
+                    case "lsdir":
+                        if (partes.length == 2) {
+                            listarDiretorioEspecifico(diretorioAtual, partes[1]);
+                        } else {
+                            System.out.println("Uso: lsdir <nome_do_diretorio>");
+                        }
+                        break;
+                    case "mv":
+                        if (partes.length == 3) {
+                            Directory destino = diretorioAtual.buscarSubdiretorio(partes[1]);
+                            if (destino != null) {
+                                moverArquivo(diretorioAtual, destino, partes[2]);
+                            } else {
+                                System.out.println("Diretório de destino " + partes[1] + " não encontrado.");
+                            }
+                        } else {
+                            System.out.println("Uso: mv <origem> <destino>");
+                        }
+                        break;
+                    case "rename":
+                        if (partes.length == 3) {
+                            renomearArquivo(diretorioAtual, partes[1], partes[2]);
+                        } else {
+                            System.out.println("Uso: rename <nome_antigo> <novo_nome>");
+                        }
+                        break;
+                    case "renamedir":
+                        if (partes.length == 3) {
+                            renomearDiretorio(diretorioAtual, partes[1], partes[2]);
+                        } else {
+                            System.out.println("Uso: renamedir <nome_antigo> <novo_nome>");
+                        }
+                        break;
+                    case "cp":
+                        if (partes.length == 3) {
+                            copiarArquivo(diretorioAtual, partes[1], partes[2]);
+                        } else {
+                            System.out.println("Uso: cp <nome_original> <nome_copia>");
+                        }
                         break;
                     case "help":
                         exibirAjuda();
                         break;
                     case "exit":
-                        System.out.println("Encerrando o simulador. Até logo!");
+                        System.out.println("Saindo...");
                         scanner.close();
                         return;
                     default:
-                        System.out.println("Comando inválido. Digite 'help' para ajuda.");
+                        System.out.println("Comando não reconhecido. Digite 'help' para obter a lista de comandos.");
                 }
-            } catch (Exception e) { // Captura de exceções genéricas, se necessário
-                System.err.println("Erro inesperado: " + e.getMessage());
+            } catch (Exception e) {
+                System.out.println("Erro: " + e.getMessage());
             }
         }
     }
+
 
     public static void main(String[] args) {
         modoShell();
