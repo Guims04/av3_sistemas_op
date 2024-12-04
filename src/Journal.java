@@ -1,15 +1,27 @@
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Journal {
-    private static final String JOURNAL_FILE = "journal.log";
+public class Journal implements Serializable { // Implementando Serializable
+    private static final long serialVersionUID = 1L;  // Adicionando o serialVersionUID (opcional, mas recomendado)
 
-    public void registrarOperacao(String operacao) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(JOURNAL_FILE, true))) {
-            writer.write(operacao + "\n");
-        } catch (IOException e) {
-            System.err.println("Erro ao registrar operação no journal: " + e.getMessage());
-        }
+    private List<String> logs;
+
+    public Journal() {
+        logs = new ArrayList<>();
+    }
+
+    public void log(String message) {
+        logs.add(message);
+        // Salvar logs em arquivo ou console
+        System.out.println(message);
+    }
+
+    public void log_no_sout(String message) {
+        logs.add(message);
+    }
+
+    public List<String> getLogs() {
+        return logs;
     }
 }

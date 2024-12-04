@@ -1,7 +1,7 @@
-public class File {
+public class Arquivo {
     private String nome;
 
-    public File(String nome) {
+    public Arquivo(String nome) {
         this.nome = nome;
     }
 

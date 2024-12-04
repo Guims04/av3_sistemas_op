@@ -1,7 +1,10 @@
+import java.io.*;
 import java.util.*;
 
 public class FileSystemSimulator {
-    private static Diretorio raiz = new Diretorio("raiz");
+
+    private static Diretorio raiz = new Diretorio("root");
+    private static Journal journal = new Journal();
     private static Diretorio diretorioAtual = raiz;
     private static Object itemCopiado = null;
 
@@ -35,19 +38,19 @@ public class FileSystemSimulator {
 
     private static void criarArquivo(String nomeArquivo) {
         if (diretorioAtual.arquivos.contains(nomeArquivo)) {
-            System.out.println("Erro: O arquivo já existe.");
+            journal.log("Erro: O arquivo já existe.");
         } else {
             diretorioAtual.arquivos.add(nomeArquivo);
-            System.out.println("Arquivo '" + nomeArquivo + "' criado com sucesso.");
+            journal.log("Arquivo '" + nomeArquivo + "' criado com sucesso.");
         }
     }
 
     private static void criarDiretorio(String nomeDiretorio) {
         if (diretorioAtual.subdiretorios.containsKey(nomeDiretorio)) {
-            System.out.println("Erro: O diretório já existe.");
+            journal.log("Erro: O diretório já existe.");
         } else {
             diretorioAtual.subdiretorios.put(nomeDiretorio, new Diretorio(nomeDiretorio));
-            System.out.println("Diretório '" + nomeDiretorio + "' criado com sucesso.");
+            journal.log("Diretório '" + nomeDiretorio + "' criado com sucesso.");
         }
     }
 
@@ -55,17 +58,17 @@ public class FileSystemSimulator {
         if (caminho.equals("..")) {
             if (diretorioAtual != raiz) {
                 diretorioAtual = encontrarPai(diretorioAtual);
-                System.out.println("Retornou ao diretório: /" + obterCaminhoCompleto(diretorioAtual));
+                journal.log("Retornou ao diretório: /" + obterCaminhoCompleto(diretorioAtual));
             } else {
-                System.out.println("Erro: Já está no diretório raiz.");
+                journal.log("Erro: Já está no diretório raiz.");
             }
         } else {
             Diretorio novoDiretorio = diretorioAtual.subdiretorios.get(caminho);
             if (novoDiretorio != null) {
                 diretorioAtual = novoDiretorio;
-                System.out.println("Mudou para o diretório: /" + obterCaminhoCompleto(diretorioAtual));
+                journal.log("Mudou para o diretório: /" + obterCaminhoCompleto(diretorioAtual));
             } else {
-                System.out.println("Erro: Diretório não encontrado.");
+                journal.log("Erro: Diretório não encontrado.");
             }
         }
     }
@@ -73,34 +76,34 @@ public class FileSystemSimulator {
     private static void copiarItem(String nome) {
         if (diretorioAtual.arquivos.contains(nome)) {
             itemCopiado = nome; // Copiar o nome do arquivo
-            System.out.println("Arquivo '" + nome + "' copiado.");
+            journal.log("Arquivo '" + nome + "' copiado.");
         } else if (diretorioAtual.subdiretorios.containsKey(nome)) {
             itemCopiado = diretorioAtual.subdiretorios.get(nome); // Copiar referência do diretório
-            System.out.println("Diretório '" + nome + "' copiado.");
+            journal.log("Diretório '" + nome + "' copiado.");
         } else {
-            System.out.println("Erro: Arquivo ou diretório não encontrado para copiar.");
+            journal.log("Erro: Arquivo ou diretório não encontrado para copiar.");
         }
     }
 
     private static void colarItem() {
         if (itemCopiado == null) {
-            System.out.println("Erro: Nenhum item copiado.");
+            journal.log("Erro: Nenhum item copiado.");
         } else if (itemCopiado instanceof String) {
             String nomeArquivo = (String) itemCopiado;
             if (!diretorioAtual.arquivos.contains(nomeArquivo)) {
                 diretorioAtual.arquivos.add(nomeArquivo);
-                System.out.println("Arquivo '" + nomeArquivo + "' colado.");
+                journal.log("Arquivo '" + nomeArquivo + "' colado.");
             } else {
-                System.out.println("Erro: O arquivo já existe no diretório atual.");
+                journal.log("Erro: O arquivo já existe no diretório atual.");
             }
         } else if (itemCopiado instanceof Diretorio) {
             Diretorio diretorioCopiado = (Diretorio) itemCopiado;
             if (!diretorioAtual.subdiretorios.containsKey(diretorioCopiado.nome)) {
                 Diretorio novoDiretorio = copiarDiretorioRecursivamente(diretorioCopiado);
                 diretorioAtual.subdiretorios.put(novoDiretorio.nome, novoDiretorio);
-                System.out.println("Diretório '" + diretorioCopiado.nome + "' colado.");
+                journal.log("Diretório '" + diretorioCopiado.nome + "' colado.");
             } else {
-                System.out.println("Erro: O diretório já existe no diretório atual.");
+                journal.log("Erro: O diretório já existe no diretório atual.");
             }
         }
     }
@@ -115,9 +118,9 @@ public class FileSystemSimulator {
     }
 
     private static void exibirArvore(Diretorio dir, String prefixo) {
-        System.out.println(prefixo + "|-- " + dir.nome);
+        journal.log(prefixo + "|-- " + dir.nome);
         for (String arquivo : dir.arquivos) {
-            System.out.println(prefixo + "    |-- " + arquivo);
+            journal.log(prefixo + "    |-- " + arquivo);
         }
         for (Diretorio subdir : dir.subdiretorios.values()) {
             exibirArvore(subdir, prefixo + "    ");
@@ -129,9 +132,9 @@ public class FileSystemSimulator {
             Diretorio diretorio = diretorioAtual.subdiretorios.remove(nomeAntigo);
             diretorio.nome = nomeNovo;
             diretorioAtual.subdiretorios.put(nomeNovo, diretorio);
-            System.out.println("Diretório '" + nomeAntigo + "' renomeado para '" + nomeNovo + "'.");
+            journal.log("Diretório '" + nomeAntigo + "' renomeado para '" + nomeNovo + "'.");
         } else {
-            System.out.println("Erro: Diretório não encontrado para renomear.");
+            journal.log("Erro: Diretório não encontrado para renomear.");
         }
     }
 
@@ -139,9 +142,9 @@ public class FileSystemSimulator {
         if (diretorioAtual.arquivos.contains(nomeAntigo)) {
             int indice = diretorioAtual.arquivos.indexOf(nomeAntigo);
             diretorioAtual.arquivos.set(indice, nomeNovo);
-            System.out.println("Arquivo '" + nomeAntigo + "' renomeado para '" + nomeNovo + "'.");
+            journal.log("Arquivo '" + nomeAntigo + "' renomeado para '" + nomeNovo + "'.");
         } else {
-            System.out.println("Erro: Arquivo não encontrado para renomear.");
+            journal.log("Erro: Arquivo não encontrado para renomear.");
         }
     }
 
@@ -157,20 +160,51 @@ public class FileSystemSimulator {
         System.out.println("8. paste - Colar o arquivo ou diretório copiado");
         System.out.println("9. renamedir [nome_antigo] [nome_novo] - Renomear diretório");
         System.out.println("10. rename [nome_antigo] [nome_novo] - Renomear arquivos");
-        System.out.println("11. exit - Sair do programa");
+        System.out.println("11. open_journal - Mostra os logs do journal");
+        System.out.println("12. tree - Mostra a arvore dos diretórios e arquivos");
+        System.out.println("13. help - Mostra o menu de comandos");
+        System.out.println("14. exit - Sair do programa");
+    }
+
+    public static void saveState() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("filesystem.dat"))) {
+            oos.writeObject(raiz);  // Salva o diretório raiz
+            oos.writeObject(journal); // Salva o journal
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void loadState() {
+        File file = new File("filesystem.dat");
+        if (!file.exists()) {
+            System.out.println("Arquivo filesystem.dat não encontrado. Criando novo estado inicial...");
+            saveState(); // Salva o estado inicial (diretório raiz vazio e journal vazio)
+            return;
+        }
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("filesystem.dat"))) {
+            raiz = (Diretorio) ois.readObject();
+            journal = (Journal) ois.readObject();
+            diretorioAtual = raiz;
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Bem-vindo ao Gerenciador de Arquivos");
+        exibirMenu();
+        loadState();
 
         while (true) {
-            exibirMenu();
             String caminhoAtual = obterCaminhoCompleto(diretorioAtual);
             System.out.print("\n" + caminhoAtual + " > ");
             String comando = scanner.nextLine().trim();
+            journal.log_no_sout(comando);
             if (comando.equals("exit")) {
-                System.out.println("Encerrando o programa.");
+                saveState();
+                journal.log("Encerrando o programa.");
                 break;
             } else if (comando.startsWith("cd ")) {
                 String caminho = comando.substring(3).trim();
@@ -185,12 +219,12 @@ public class FileSystemSimulator {
                 String nome = comando.substring(3).trim();
                 if (diretorioAtual.arquivos.contains(nome)) {
                     diretorioAtual.arquivos.remove(nome);
-                    System.out.println("Arquivo '" + nome + "' excluído.");
+                    journal.log("Arquivo '" + nome + "' excluído.");
                 } else if (diretorioAtual.subdiretorios.containsKey(nome)) {
                     diretorioAtual.subdiretorios.remove(nome);
-                    System.out.println("Diretório '" + nome + "' excluído.");
+                    journal.log("Diretório '" + nome + "' excluído.");
                 } else {
-                    System.out.println("Erro: Arquivo ou diretório não encontrado.");
+                    journal.log("Erro: Arquivo ou diretório não encontrado.");
                 }
             } else if (comando.startsWith("copy ")) {
                 String nome = comando.substring(5).trim();
@@ -199,29 +233,39 @@ public class FileSystemSimulator {
                 colarItem();
             } else if (comando.equals("ls")) {
                 for (String arquivo : diretorioAtual.arquivos) {
-                    System.out.println("Arquivo: " + arquivo);
+                    journal.log("Arquivo: " + arquivo);
                 }
                 for (String subdir : diretorioAtual.subdiretorios.keySet()) {
-                    System.out.println("Diretório: " + subdir);
+                    journal.log("Diretório: " + subdir);
                 }
             } else if (comando.startsWith("rename ")) {
                 String[] partes = comando.split(" ");
                 if (partes.length == 3) {
                     renomearArquivo(partes[1], partes[2]);
                 } else {
-                    System.out.println("Uso incorreto. Formato esperado: rename [nome_antigo] [nome_novo]");
+                    journal.log("Uso incorreto. Formato esperado: rename [nome_antigo] [nome_novo]");
                 }
             } else if (comando.startsWith("renamedir ")) {
                 String[] partes = comando.split(" ");
                 if (partes.length == 3) {
                     renomearDiretorio(partes[1], partes[2]);
                 } else {
-                    System.out.println("Uso incorreto. Formato esperado: renamedir [nome_antigo] [nome_novo]");
+                    journal.log("Uso incorreto. Formato esperado: renamedir [nome_antigo] [nome_novo]");
                 }
+            } else if (comando.startsWith("open_journal")) {
+                List<String> logs = journal.getLogs();
+                System.out.println("\n\n-------------- Journal <start> --------------");
+                for (int i = 0; i < logs.size(); i++){
+                    System.out.println(logs.get(i));
+                }
+                System.out.println("-------------- Journal <end>  --------------\n\n");
+            } else if (comando.startsWith("tree")) {
+                exibirArvore(raiz, "");
+            } else if (comando.startsWith("help")) {
+                exibirMenu();
             } else {
-                System.out.println("Comando inválido. Tente novamente.");
+                journal.log("Comando inválido. Tente novamente.");
             }
-            exibirArvore(raiz, "");
         }
         scanner.close();
     }
