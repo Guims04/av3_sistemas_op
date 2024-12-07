@@ -37,10 +37,11 @@ public class FileSystemSimulator {
     }
 
     private static void criarArquivo(String nomeArquivo) {
-        if (diretorioAtual.arquivos.contains(nomeArquivo)) {
+        Arquivo arquivo = new Arquivo(nomeArquivo);
+        if (diretorioAtual.arquivos.contains(arquivo)) {
             journal.log("Erro: O arquivo já existe.");
         } else {
-            diretorioAtual.arquivos.add(nomeArquivo);
+            diretorioAtual.arquivos.add(arquivo);
             journal.log("Arquivo '" + nomeArquivo + "' criado com sucesso.");
         }
     }
@@ -74,12 +75,13 @@ public class FileSystemSimulator {
     }
 
     private static void copiarItem(String nome) {
-        if (diretorioAtual.arquivos.contains(nome)) {
-            itemCopiado = nome; // Copiar o nome do arquivo
-            journal.log("Arquivo '" + nome + "' copiado.");
-        } else if (diretorioAtual.subdiretorios.containsKey(nome)) {
-            itemCopiado = diretorioAtual.subdiretorios.get(nome); // Copiar referência do diretório
-            journal.log("Diretório '" + nome + "' copiado.");
+        Arquivo arquivo = new Arquivo(nome);
+        if (diretorioAtual.arquivos.contains(arquivo)) {
+            itemCopiado = arquivo; // Copiar o nome do arquivo
+            journal.log("Arquivo '" + arquivo + "' copiado.");
+        } else if (diretorioAtual.subdiretorios.containsKey(arquivo)) {
+            itemCopiado = diretorioAtual.subdiretorios.get(arquivo); // Copiar referência do diretório
+            journal.log("Diretório '" + arquivo + "' copiado.");
         } else {
             journal.log("Erro: Arquivo ou diretório não encontrado para copiar.");
         }
@@ -88,11 +90,10 @@ public class FileSystemSimulator {
     private static void colarItem() {
         if (itemCopiado == null) {
             journal.log("Erro: Nenhum item copiado.");
-        } else if (itemCopiado instanceof String) {
-            String nomeArquivo = (String) itemCopiado;
-            if (!diretorioAtual.arquivos.contains(nomeArquivo)) {
-                diretorioAtual.arquivos.add(nomeArquivo);
-                journal.log("Arquivo '" + nomeArquivo + "' colado.");
+        } else if (itemCopiado instanceof Arquivo) {
+            if (!diretorioAtual.arquivos.contains(itemCopiado)) {
+                diretorioAtual.arquivos.add((Arquivo) itemCopiado);
+                journal.log("Arquivo '" + itemCopiado + "' colado.");
             } else {
                 journal.log("Erro: O arquivo já existe no diretório atual.");
             }
@@ -119,8 +120,8 @@ public class FileSystemSimulator {
 
     private static void exibirArvore(Diretorio dir, String prefixo) {
         journal.log(prefixo + "|-- " + dir.nome);
-        for (String arquivo : dir.arquivos) {
-            journal.log(prefixo + "    |-- " + arquivo);
+        for (Arquivo arquivo : dir.arquivos) {
+            journal.log(prefixo + "    |-- " + arquivo.getNome());
         }
         for (Diretorio subdir : dir.subdiretorios.values()) {
             exibirArvore(subdir, prefixo + "    ");
@@ -139,9 +140,11 @@ public class FileSystemSimulator {
     }
 
     private static void renomearArquivo(String nomeAntigo, String nomeNovo) {
-        if (diretorioAtual.arquivos.contains(nomeAntigo)) {
-            int indice = diretorioAtual.arquivos.indexOf(nomeAntigo);
-            diretorioAtual.arquivos.set(indice, nomeNovo);
+        Arquivo arquivoAntigo = new Arquivo(nomeAntigo);
+        if (diretorioAtual.arquivos.contains(arquivoAntigo)) {
+            int indice = diretorioAtual.arquivos.indexOf(arquivoAntigo);
+            Arquivo newArquivo = new Arquivo(nomeNovo);
+            diretorioAtual.arquivos.set(indice, newArquivo);
             journal.log("Arquivo '" + nomeAntigo + "' renomeado para '" + nomeNovo + "'.");
         } else {
             journal.log("Erro: Arquivo não encontrado para renomear.");
@@ -217,8 +220,9 @@ public class FileSystemSimulator {
                 criarArquivo(nomeArquivo);
             } else if (comando.startsWith("rm ")) {
                 String nome = comando.substring(3).trim();
-                if (diretorioAtual.arquivos.contains(nome)) {
-                    diretorioAtual.arquivos.remove(nome);
+                Arquivo arquivo = new Arquivo(nome);
+                if (diretorioAtual.arquivos.contains(arquivo)) {
+                    diretorioAtual.arquivos.remove(arquivo);
                     journal.log("Arquivo '" + nome + "' excluído.");
                 } else if (diretorioAtual.subdiretorios.containsKey(nome)) {
                     diretorioAtual.subdiretorios.remove(nome);
@@ -232,7 +236,7 @@ public class FileSystemSimulator {
             } else if (comando.equals("paste")) {
                 colarItem();
             } else if (comando.equals("ls")) {
-                for (String arquivo : diretorioAtual.arquivos) {
+                for (Arquivo arquivo : diretorioAtual.arquivos) {
                     journal.log("Arquivo: " + arquivo);
                 }
                 for (String subdir : diretorioAtual.subdiretorios.keySet()) {
