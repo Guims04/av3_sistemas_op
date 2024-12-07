@@ -3,7 +3,8 @@ import java.util.*;
 
 public class FileSystemSimulator {
 
-    private static Diretorio raiz = new Diretorio("root");
+    //private static Arquivo raiz_dir = new Arquivo("root");
+    private static Diretorio raiz = new Diretorio("raiz");
     private static Journal journal = new Journal();
     private static Diretorio diretorioAtual = raiz;
     private static Object itemCopiado = null;
@@ -120,8 +121,8 @@ public class FileSystemSimulator {
 
     private static void exibirArvore(Diretorio dir, String prefixo) {
         journal.log(prefixo + "|-- " + dir.nome);
-        for (Arquivo arquivo : dir.arquivos) {
-            journal.log(prefixo + "    |-- " + arquivo.getNome());
+        for (int i = 0; i < dir.arquivos.size(); i++) {
+            System.out.println(prefixo + "    |-- " + dir.arquivos.get(i));
         }
         for (Diretorio subdir : dir.subdiretorios.values()) {
             exibirArvore(subdir, prefixo + "    ");
@@ -236,16 +237,26 @@ public class FileSystemSimulator {
             } else if (comando.equals("paste")) {
                 colarItem();
             } else if (comando.equals("ls")) {
-                for (Arquivo arquivo : diretorioAtual.arquivos) {
-                    journal.log("Arquivo: " + arquivo);
+                System.out.println("Conteúdo do diretório atual:");
+                for (int i = 0; i < diretorioAtual.arquivos.size(); i++) {
+                    System.out.println("Arquivo: " + diretorioAtual.arquivos.get(i));
                 }
                 for (String subdir : diretorioAtual.subdiretorios.keySet()) {
-                    journal.log("Diretório: " + subdir);
+                    System.out.println("Diretório: " + subdir);
                 }
             } else if (comando.startsWith("rename ")) {
                 String[] partes = comando.split(" ");
                 if (partes.length == 3) {
-                    renomearArquivo(partes[1], partes[2]);
+                    String nomeAntigo = partes[1];
+                    String nomeNovo = partes[2];
+                    Arquivo arquivoAntigo = new Arquivo(nomeAntigo);
+                    if (diretorioAtual.arquivos.contains(arquivoAntigo)) {
+                        renomearArquivo(nomeAntigo, nomeNovo);
+                    } else if (diretorioAtual.subdiretorios.containsKey(nomeAntigo)) {
+                        renomearDiretorio(nomeAntigo, nomeNovo);
+                    } else {
+                        journal.log("Erro: Arquivo ou diretório '" + nomeAntigo + "' não encontrado.");
+                    }
                 } else {
                     journal.log("Uso incorreto. Formato esperado: rename [nome_antigo] [nome_novo]");
                 }
